@@ -1,4 +1,5 @@
 import express from 'express';
+import db from './db.js';
 
 const api = express();
 
@@ -40,39 +41,72 @@ api.put('/api/body', (req, res) => {
  * DELETE        /employees/:employeeId   deleteEmployeeById
  */
 
-api.get('/employees', (req, res) => {
-  return res.json({
-    employees: 'Acá todos los empleados',
-  });
+api.get('/employees', async (req, res) => {
+  try {
+    const employees = await db.select('*').from('employees');
+    return res.json({
+      msg: 'Empleados obtenidos',
+      employees,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      msg: 'Error obteniendo todos los empleados',
+    });
+  }
 });
 
-api.get('/employees/:employeeId', (req, res) => {
-  const { employeeId } = req.params;
+// api.get('/employees/:employeeId', (req, res) => {
+//   const { employeeId } = req.params;
 
-  return res.json({
-    employee: `Aca el empleado con id ${employeeId}`,
-  });
+//   return res.json({
+//     employee: `Aca el empleado con id ${employeeId}`,
+//   });
+// });
+
+// api.put('/employees/:employeeId', (req, res) => {
+//   const { employeeId } = req.params;
+//   return res.json({
+//     employee: `Aca se modifica el empleado con id ${employeeId}`,
+//   });
+// });
+
+api.post('/employees', async (req, res) => {
+  const { first_name, salary } = req.body;
+
+  //leyes de  morgan
+  if (!first_name || !salary) {
+    return res.status(400).json({
+      msg: 'Invalid body',
+    });
+  }
+
+  try {
+    const newEmployee = await db('employees')
+      .insert({
+        first_name,
+        salary,
+      })
+      .returning('salary');
+
+    return res.status(201).json({
+      msg: 'Empleado registrado',
+      employee: newEmployee,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      msg: 'Error registrando empleado',
+    });
+  }
 });
 
-api.put('/employees/:employeeId', (req, res) => {
-  const { employeeId } = req.params;
-  return res.json({
-    employee: `Aca se modifica el empleado con id ${employeeId}`,
-  });
-});
-
-api.post('/employees', (req, res) => {
-  return res.json({
-    employee: `Acá se crea un nuevo emmpleado `,
-  });
-});
-
-api.delete('/employees/:employeeId', (req, res) => {
-  const { employeeId } = req.params;
-  return res.json({
-    employee: `Aca se elimina el empleado con id ${employeeId}`,
-  });
-});
+// api.delete('/employees/:employeeId', (req, res) => {
+//   const { employeeId } = req.params;
+//   return res.json({
+//     employee: `Aca se elimina el empleado con id ${employeeId}`,
+//   });
+// });
 
 api.listen(8000, () => {
   console.log('Servidor corriendo en puerto 8000');
