@@ -16,6 +16,64 @@ api.put('/api/body', (req, res) => {
   return res.json(req.body);
 });
 
+/**
+ * CRUD
+ */
+
+/**
+ * employees
+ *
+ * employee_id
+ * name
+ * role
+ * phone
+ *
+ */
+
+/**
+ *
+ * HTTP method  enpoint                    Qué hace?
+ * GET           /employess               getAllEmployees
+ * GET           /employees/:employeeId   getEmployeeById
+ * PUT           /employees/:employeeId   updateEmployeeById
+ * POST          /employees               createEmployee
+ * DELETE        /employees/:employeeId   deleteEmployeeById
+ */
+
+api.get('/employees', (req, res) => {
+  return res.json({
+    employees: 'Acá todos los empleados',
+  });
+});
+
+api.get('/employees/:employeeId', (req, res) => {
+  const { employeeId } = req.params;
+
+  return res.json({
+    employee: `Aca el empleado con id ${employeeId}`,
+  });
+});
+
+api.put('/employees/:employeeId', (req, res) => {
+  const { employeeId } = req.params;
+  return res.json({
+    employee: `Aca se modifica el empleado con id ${employeeId}`,
+  });
+});
+
+api.post('/employees', (req, res) => {
+  return res.json({
+    employee: `Acá se crea un nuevo emmpleado `,
+  });
+});
+
+api.delete('/employees/:employeeId', (req, res) => {
+  const { employeeId } = req.params;
+  return res.json({
+    employee: `Aca se elimina el empleado con id ${employeeId}`,
+  });
+});
+
 api.listen(8000, () => {
   console.log('Servidor corriendo en puerto 8000');
 });
